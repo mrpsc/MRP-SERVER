@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.Identity;
 using MRP.Common.DTO;
+using MRP.Common.DTO.Pages;
 using MRP.Common.IRepositories;
 using MRP.DAL.Repositories;
 using System;
@@ -33,9 +34,9 @@ namespace MRP.BL
             return authRep.Register(regInfo);
         }
 
-        public Task<IEnumerable<UserDTO>> GetAllUsersAsync()
+        public async Task<UsersPage> GetAllUsersAsync(int limit, int skip)
         {
-            return userRep.GetAllUsersAsync();
+            return await userRep.GetAllUsersAsync(limit, skip);
         }
 
         public Task<UserDTO> GetUserAsync(string username)
@@ -46,6 +47,16 @@ namespace MRP.BL
         public Task<bool> RecoverPasswordAsync(RecoveryInfo recInfo)
         {
             return authRep.RecoverPasswordAsync(recInfo);
+        }
+
+        public async Task<UserDTO> UpdateUserAsync(UserDTO user)
+        {
+            return await userRep.UpdateUserAsync(user);
+        }
+
+        public async Task<bool> RemoveUserAsync(string email)
+        {
+            return await userRep.RemoveUserAsync(email);
         }
     }
 }

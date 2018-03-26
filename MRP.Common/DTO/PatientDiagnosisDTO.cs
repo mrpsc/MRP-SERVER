@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MRP.Common.DTO
 {
-    public class PatientDiagnosisDTO
+    public class PatientDiagnoseDTO
     {
         public int Id { get; set; }
         public string PatientId { get; set; }

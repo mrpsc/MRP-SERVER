@@ -29,7 +29,7 @@ namespace MRP.API.Providers
 
             var identity = new ClaimsIdentity(context.Options.AuthenticationType);
             identity.AddClaim(new Claim("sub", context.UserName));
-            user.Roles.ForEach(r => identity.AddClaim(new Claim("role", r)));
+            identity.AddClaim(new Claim("role", user.Roles.ToString()));
             context.Validated(identity);
         }
     }

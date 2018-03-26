@@ -10,6 +10,7 @@ using MRP.Common.IRepositories;
 using System.Configuration;
 using System.Net.Mail;
 using System;
+using System.Collections.Generic;
 
 namespace MRP.DAL.Repositories
 {
@@ -20,8 +21,6 @@ namespace MRP.DAL.Repositories
         IMongoCollection<User> _users;
         UserStore<User> _store;
         UserManager<User> _userManager;
-        //IMongoCollection<IdentityRole> _roles;
-        //RoleStore<IdentityRole> _roleStore;
 
 
         public AuthRepository()
@@ -31,8 +30,6 @@ namespace MRP.DAL.Repositories
             _users = _database.GetCollection<User>("AspNetUsers");
             _store = new UserStore<User>(_users);
             _userManager = new UserManager<User>(_store);
-            //_roles = _database.GetCollection<IdentityRole>("roles");
-            //_roleStore = new RoleStore<IdentityRole>(_roles);
         }
 
         public async Task<UserDTO> Login(string username, string password)
@@ -48,10 +45,7 @@ namespace MRP.DAL.Repositories
                 UserName = regInfo.Username,
                 FullName = regInfo.FullName,
                 Email = regInfo.EmailAddress,
-                DateOfBirth = regInfo.DateOfBirth,
-                ContactInfo = regInfo.ContactInfo,
-                LicenceID = regInfo.LicenceID,
-                Institutions = regInfo.Institutions.ConvertToModelExtension().ToList()
+                MadicalInstitution = regInfo.Institution.ConvertToModel()
             };
             return await _userManager.CreateAsync(user, regInfo.Password);
         }
@@ -61,7 +55,7 @@ namespace MRP.DAL.Repositories
             string pwd = RandomPasswordGenerator.GeneratePassword(8);
             string hashPwd = _userManager.PasswordHasher.HashPassword(pwd);
             var update = Builders<User>.Update.Set(u => u.PasswordHash, hashPwd);
-            User user = await _users.FindOneAndUpdateAsync(u => u.Email == recInfo.EmailAddress && u.DateOfBirth == recInfo.DateOfBirth, update);
+            User user = await _users.FindOneAndUpdateAsync(u => u.Email == recInfo.EmailAddress, update);
             if (user != null)
             {
                 await Task.Factory.StartNew(() =>
@@ -109,9 +103,13 @@ namespace MRP.DAL.Repositories
         //        return new PasswordRecoveryResponse { Message = "User not found!" };
         //    }
         //}
-        //public IEnumerable<UserDTO> GetUsers()
+        //public async IEnumerable<UserDTO> GetUsers(int limit, int skip)
         //{
-        //    return _users.ConvertToDTOExtension().ToList();
+        //    var query = _users.Find(x => x != null);
+        //    var totalUsers = query.CountAsync();
+        //    var users = query.Skip(skip).Limit(limit).ToListAsync();
+        //    await Task.WhenAll(totalUsers, users);
+        //    return .ConvertToDTOExtension();
         //}
 
         //public UserDTO GetUser(int id)

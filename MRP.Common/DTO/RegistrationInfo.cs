@@ -15,7 +15,6 @@ namespace MRP.Common.DTO
         public string EmailAddress { get; set; }
         public string ContactInfo { get; set; }
         public DateTime DateOfBirth { get; set; }
-        public string LicenceID { get; set; }
-        public IEnumerable<MedicalInstitutionDTO> Institutions { get; set; } = new List<MedicalInstitutionDTO>();
+        public MedicalInstitutionDTO Institution { get; set; }
     }
 }

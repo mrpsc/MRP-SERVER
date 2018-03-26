@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace MRP.DAL.Models
 {
-    public class PatientDiagnosis
+    public class PatientDiagnose
     {
         public int Id { get; set; }
         public string PatientId { get; set; }

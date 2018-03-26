@@ -20,16 +20,16 @@ namespace MRP.API.Controllers
             _manager = new PatientsFormSchemaManager();
         }
 
-        [Route("SaveFirstSchema"), HttpPost]
-        public async Task<IHttpActionResult> SaveFirstSchema(HttpRequestMessage request)
-        {
-            var jsonString = await request.Content.ReadAsStringAsync();
-            if (await _manager.SaveFirstSchema(jsonString))
-            {
-                return Ok();
-            }
-            return InternalServerError();
-        }
+        //[Route("SaveFirstSchema"), HttpPost]
+        //public async Task<IHttpActionResult> SaveFirstSchema(HttpRequestMessage request)
+        //{
+        //    var jsonString = await request.Content.ReadAsStringAsync();
+        //    if (await _manager.SaveFirstSchema(jsonString))
+        //    {
+        //        return Ok();
+        //    }
+        //    return InternalServerError();
+        //}
 
         [Route("GetFirstSchema"), HttpGet]
         public async Task<IHttpActionResult> GetFirstSchema()
