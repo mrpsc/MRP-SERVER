@@ -17,6 +17,7 @@ namespace MRP.Common.DTO
         public DateTime InclusionDate { get; set; }
         public string General { get; set; }
         public DateTime LastModified { get; set; }
-        public IEnumerable<PatientDiagnosisDTO> Diagnosis { get; set; } = new List<PatientDiagnosisDTO>();
+
+        public PatientDiagnoseDTO Diagnose { get; set; }
     }
 }

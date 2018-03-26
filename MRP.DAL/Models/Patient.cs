@@ -3,12 +3,14 @@ using MongoDB.Bson.Serialization.Attributes;
 using MRP.Common.DTO;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MRP.DAL.Models
 {
+    [BsonIgnoreExtraElements]
     public class Patient
     {
         [BsonRepresentation(BsonType.ObjectId)]
@@ -21,6 +23,6 @@ namespace MRP.DAL.Models
         public DateTime InclusionDate { get; set; }
         public string General { get; set; }
         public DateTime LastModified { get; set; }
-        public IEnumerable<PatientDiagnosis> Diagnosis { get; set; } = new List<PatientDiagnosis>();
+        public PatientDiagnose Diagnose { get; set; }
     }
 }

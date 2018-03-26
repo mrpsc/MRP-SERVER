@@ -2,6 +2,7 @@
 using MRP.API.Providers;
 using MRP.BL;
 using MRP.Common.DTO;
+using MRP.Common.DTO.Pages;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -28,29 +29,27 @@ namespace MRP.API.Controllers
             {
                 return BadRequest(ModelState);
             }
-
             IdentityResult result = await _manager.CreateAsync(info);
-
             IHttpActionResult errorResult = GetErrorResult(result);
-
             if (errorResult != null)
             {
                 return errorResult;
             }
-
             return Created<UserDTO>("", null);
         }
 
-        [Route("GetAllUsers"), HttpGet]
-        public async Task<IHttpActionResult> GetAllUsersAsync()
-        {
-            try
-            {
-                IEnumerable<UserDTO> users = await _manager.GetAllUsersAsync();
-                return users.GetEnumerator().Current != null ? Json(users) : (IHttpActionResult)BadRequest("no users found!"); ;
-            }
-            catch (Exception ex) { return InternalServerError(ex); }
-        } 
+        //[Authorize(Roles = "Admin")]
+        //[AllowAnonymous]
+        //[Route("GetAllUsers"), HttpGet]
+        //public async Task<IHttpActionResult> GetAllUsersAsync(int limit, int skip)
+        //{
+        //    try
+        //    {
+        //        UsersPage page = await _manager.GetAllUsersAsync(limit, skip);
+        //        return page.Count > 0 ? Json(page) : (IHttpActionResult)BadRequest("no users found!"); ;
+        //    }
+        //    catch (Exception ex) { return InternalServerError(ex); }
+        //}
 
         [Route("GetUser"), HttpGet]
         public async Task<IHttpActionResult> GetUserAsync([FromUri]string username)
@@ -75,16 +74,48 @@ namespace MRP.API.Controllers
             catch (Exception ex) { return InternalServerError(ex); }
         }
 
-        [AllowAnonymous]
-        [Route("RecoverPassword"), HttpPost]
-        public async Task<IHttpActionResult> RecoverPassword([FromBody]RecoveryInfo recInfo)
+        //[Authorize(Roles = "Admin")]
+        [Route("UpdateUser"),HttpPut]
+        public async Task<IHttpActionResult> UpdateUser([FromBody]UserDTO user)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                return await _manager.RecoverPasswordAsync(recInfo) ? Ok() : (IHttpActionResult)BadRequest("no user found!");
+                return BadRequest(ModelState);
             }
-            catch (Exception ex) { return InternalServerError(ex); }
+            UserDTO updatedUser = await _manager.UpdateUserAsync(user);
+            if (updatedUser != null)
+            {
+                return BadRequest("An error has accured while attempting to update the user.");
+            }
+            return Ok(updatedUser);
         }
+
+        //[Authorize(Roles = "Admin")]
+        [Route("RemoveUser"), HttpPut]
+        public async Task<IHttpActionResult> RemoveUser([FromUri]string userEmail)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            bool isUserDeleted = await _manager.RemoveUserAsync(userEmail);
+            if (!isUserDeleted)
+            {
+                return BadRequest("An error has accured while attempting to update the user.");
+            }
+            return Ok();
+        }
+
+        //[AllowAnonymous]
+        //[Route("RecoverPassword"), HttpPost]
+        //public async Task<IHttpActionResult> RecoverPassword([FromBody]RecoveryInfo recInfo)
+        //{
+        //    try
+        //    {
+        //        return await _manager.RecoverPasswordAsync(recInfo) ? Ok() : (IHttpActionResult)BadRequest("no user found!");
+        //    }
+        //    catch (Exception ex) { return InternalServerError(ex); }
+        //}
 
         private IHttpActionResult GetErrorResult(IdentityResult result)
         {

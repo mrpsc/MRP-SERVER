@@ -9,13 +9,11 @@ using System.Threading.Tasks;
 
 namespace MRP.DAL.Models
 {
+    [BsonIgnoreExtraElements]
     public class User : IdentityUser
     {
         public string UserId { get; set; }
         public string FullName { get; set; }
-        public string ContactInfo { get; set; }
-        public DateTime DateOfBirth { get; set; }
-        public string LicenceID { get; set; }
-        public IEnumerable<MedicalInstitution> Institutions { get; set; } = new List<MedicalInstitution>();
+        public MedicalInstitution MadicalInstitution { get; set; }
     }
 }

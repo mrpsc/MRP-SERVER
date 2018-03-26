@@ -8,21 +8,25 @@ using MRP.Common.IRepositories;
 using MRP.DAL.Repositories;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using MRP.Common.IServices;
+using MRP.BL.Services;
 
 namespace MRP.BL
 {
     public class PatientsManager
     {
         private IPatientsRepository _pRep;
-
+        private IExportService _exportService;
+        
         public PatientsManager()
         {
             _pRep = new PatientsRepository();
+            _exportService = new ExportService();
         }
 
         public Task<IEnumerable<PatientDTO>> GetPatients(FindPatientModel model)
         {
-            return _pRep.GetPatients(model);
+            return _pRep.GetPatients(model, 1, 0);
         }
 
         public Task<bool> AddPateint(PatientDTO patient)
@@ -30,40 +34,35 @@ namespace MRP.BL
             return _pRep.AddPatient(patient);
         }
 
-        public async Task<bool> AddDiagnosis(PatientDiagnosisDTO diagnosis)
+        public Task<IEnumerable<PatientDTO>> GetPatients(string query)
         {
-            return await _pRep.AddDiagnosis(diagnosis);
-        }
-        public Task<PatientDTO> EditDiagnosis(PatientDiagnosisDTO diagnosis)
-        {
-            return _pRep.EditDiagnosis(diagnosis);
+            return _pRep.GetPatients(query);
         }
 
-        public Task<PatientDTO> EditPatient(PatientDTO patient)
+        public Task<IEnumerable<PatientDTO>> GetPatients(string query, int limit, int skip)
         {
-            return _pRep.EditPatientInfo(patient);
+            return _pRep.GetPatients(query, limit, skip);
         }
 
-        //private async Task<PatientDiagnosisDTO> GetSymptomsFromRequest(string requestContent)
-        //{
-        //    PatientDiagnosisDTO diagnosis = new PatientDiagnosisDTO();
-        //    await Task.Factory.StartNew(() =>
-        //    {
-        //        dynamic json = JToken.Parse(requestContent);
-        //        dynamic symptoms = json.Symptoms;
-        //        json.Symptoms = null;
-        //        string str = JsonConvert.SerializeObject(json);
-        //        diagnosis = JsonConvert.DeserializeObject<PatientDiagnosisDTO>(str);
-        //        diagnosis.Symptoms = new Dictionary<string, dynamic>();
-        //        foreach (var s in symptoms)
-        //        {
-        //            str = JsonConvert.SerializeObject(s.Symptom);
-        //            dynamic obj = JsonConvert.DeserializeObject<dynamic>(str);
-        //            diagnosis.Symptoms.Add(s.Key.ToString(), obj);
-        //        }
-        //    });
-        //    return diagnosis;
-        //}
+        public async Task<bool> AddDiagnosis(PatientDiagnoseDTO diagnose)
+        {
+            return await _pRep.AddOrUpdateDiagnoseAsync(diagnose);
+        }
 
+        public async Task<bool> EditDiagnose(PatientDiagnoseDTO diagnose)
+        {
+            return await _pRep.AddOrUpdateDiagnoseAsync(diagnose);
+        }
+
+        public async Task<byte[]> ExportPatients(string query)
+        {
+            var patients = await GetPatients(query);
+            return _exportService.GetPatientsExcel(patients);
+        }
+
+        public Task<bool> EditPatient(PatientDTO patient)
+        {
+            return _pRep.UpdatePatient(patient);
+        }
     }
 }

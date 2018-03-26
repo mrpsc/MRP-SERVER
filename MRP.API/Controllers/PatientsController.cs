@@ -1,17 +1,15 @@
 ﻿using MRP.BL;
 using MRP.Common.DTO;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
-using System.Web.Http.Results;
 
 namespace MRP.API.Controllers
 {
@@ -36,45 +34,80 @@ namespace MRP.API.Controllers
             catch (Exception ex) { return InternalServerError(ex); }
         }
 
+        [Route("GetPatients"), HttpPost]
+        public async Task<IHttpActionResult> GetPatients([FromBody]string query, [FromUri]int limit, [FromUri]int skip)
+        {
+            try
+            {
+                IEnumerable<PatientDTO> patients = await _manager.GetPatients(query, limit, skip);
+                return patients.Count() > 0 ? Json(patients) : (IHttpActionResult)BadRequest("no patients found!");
+            }
+            catch (Exception ex) { return InternalServerError(ex); }
+        }
+
         [Route("AddPatient"),HttpPost]
         public async Task<IHttpActionResult> AddPatient([FromBody]PatientDTO patient)
         {
             try
             {
-                return await _manager.AddPateint(patient) ? Created<PatientDiagnosisDTO>("", null) : (IHttpActionResult)BadRequest("changes not excepted!");
+                return await _manager.AddPateint(patient) ? Created<PatientDiagnoseDTO>("", null) : (IHttpActionResult)BadRequest("changes not excepted!");
             }
             catch (Exception ex) { return InternalServerError(ex); }
         }
 
-        [Route("AddDiagnosis"),HttpPost]
-        public async Task<IHttpActionResult> AddDiagnosis([FromBody]PatientDiagnosisDTO diagnosis)
-        {
-            try
-            {
-                return await _manager.AddDiagnosis(diagnosis) ? Created<PatientDiagnosisDTO>("",null) : (IHttpActionResult)BadRequest("changes not excepted!");
-            }
-            catch (Exception ex) { return InternalServerError(ex); }
+        //[Route("AddDiagnosis"),HttpPost]
+        //public async Task<IHttpActionResult> AddDiagnosis([FromBody]PatientDiagnoseDTO diagnosis)
+        //{
+        //    try
+        //    {
+        //        // return await _manager.AddDiagnosis(diagnosis) ? Created<PatientDiagnosisDTO>("",null) : (IHttpActionResult)BadRequest("changes not excepted!");
+        //        return Ok();
+        //    }
+        //    catch (Exception ex) { return InternalServerError(ex); }
             
-        }
+        //}
 
         [Route("EditPatient"),HttpPut]
         public async Task<IHttpActionResult> EditPatient([FromBody]PatientDTO patient)
         {
             try
             {
-                var p = await _manager.EditPatient(patient);
-                return p != null ? Ok(p) : (IHttpActionResult)BadRequest("changes not excepted!");
+                var isUpdated = await _manager.EditPatient(patient);
+
+                return isUpdated ? Ok() : (IHttpActionResult)BadRequest("changes not excepted!");
             }
             catch (Exception ex) { return InternalServerError(ex); }
         }
 
         [Route("EditDiagnosis"),HttpPut]
-        public async Task<IHttpActionResult> EditDiagnosis([FromBody]PatientDiagnosisDTO diagnosis)
+        public async Task<IHttpActionResult> EditDiagnose([FromBody]PatientDiagnoseDTO diagnosis)
         {
             try
             {
-                var patient = await _manager.EditDiagnosis(diagnosis);
-                return patient != null ? Ok(patient) : (IHttpActionResult)BadRequest("changes not excepted!");
+                var isUpdated = await _manager.EditDiagnose(diagnosis);
+                return isUpdated ? Ok(isUpdated) : (IHttpActionResult)BadRequest("changes not excepted!");
+            }
+            catch (Exception ex) { return InternalServerError(ex); }
+        }
+        
+        [Route("ExportPatients"), HttpPost]
+        public async Task<IHttpActionResult> ExportPatients([FromBody]string query)
+        {
+            try
+            {
+                // IEnumerable<PatientDTO> patients = await _manager.GetPatients(query);
+                byte[] file = await _manager.ExportPatients(query);
+                var result = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new ByteArrayContent(file)
+                };
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+                {
+                    FileName = "Information" + DateTime.Now.Year.ToString() + ".xlsx"
+                };
+                result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.ms-excel");
+                var response = ResponseMessage(result);
+                return response;
             }
             catch (Exception ex) { return InternalServerError(ex); }
         }

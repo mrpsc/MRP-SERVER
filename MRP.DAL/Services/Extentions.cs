@@ -64,21 +64,21 @@ namespace MRP.DAL.Services
         }
         #endregion
         #region patient diagnosis
-        public static IEnumerable<PatientDiagnosisDTO> ConvertToDTOExtension(this IEnumerable<PatientDiagnosis> dia)
+        public static IEnumerable<PatientDiagnoseDTO> ConvertToDTOExtension(this IEnumerable<PatientDiagnose> dia)
         {
             if (dia != null)
             {
-                foreach (PatientDiagnosis d in dia)
+                foreach (PatientDiagnose d in dia)
                 {
                     yield return d.ConvertToDTO();
                 }
             }
         }
-        public static IEnumerable<PatientDiagnosis> ConvertToModelExtension(this IEnumerable<PatientDiagnosisDTO> dia)
+        public static IEnumerable<PatientDiagnose> ConvertToModelExtension(this IEnumerable<PatientDiagnoseDTO> dia)
         {
             if (dia != null)
             {
-                foreach (PatientDiagnosisDTO d in dia)
+                foreach (PatientDiagnoseDTO d in dia)
                 {
                     yield return d.ConvertToModel();
                 }
@@ -92,19 +92,17 @@ namespace MRP.DAL.Services
     {
         public static UserDTO ConvertToDTO(this User u)
         {
-            return u != null ? new UserDTO
+            UserDTO user = u != null ? new UserDTO
             {
                 Id = u.Id,
                 UserId = u.UserId,
                 UserName = u.UserName,
                 EmailAddress = u.Email,
                 FullName = u.FullName,
-                DateOfBirth = u.DateOfBirth,
-                ContactInfo = u.ContactInfo,
-                Roles = u.Roles,
-                LicenceID = u.LicenceID,
-                Institutions = u.Institutions.ConvertToDTOExtension().ToList()
+                MedicalInstitution = u.MadicalInstitution.ConvertToDTO(),
+                Roles = u.Roles
             } : null;
+            return user;
         }
     }
 
@@ -123,13 +121,13 @@ namespace MRP.DAL.Services
                 InclusionDate = p.InclusionDate,
                 General = p.General,
                 LastModified = p.LastModified,
-                Diagnosis = p.Diagnosis.ConvertToDTOExtension().ToList()
+                Diagnose = p.Diagnose.ConvertToDTO()
             } : null;
         }
 
-        public static PatientDiagnosisDTO ConvertToDTO(this PatientDiagnosis d)
+        public static PatientDiagnoseDTO ConvertToDTO(this PatientDiagnose d)
         {
-            return d != null ? new PatientDiagnosisDTO
+            return d != null ? new PatientDiagnoseDTO
             {
                 Id = d.Id,
                 PatientId = d.PatientId,
@@ -163,13 +161,13 @@ namespace MRP.DAL.Services
                 InclusionDate = p.InclusionDate,
                 General = p.General,
                 LastModified = p.LastModified,
-                Diagnosis = p.Diagnosis.ConvertToModelExtension().ToList()
+                Diagnose = p.Diagnose.ConvertToModel()
             } : null;
         }
 
-        public static PatientDiagnosis ConvertToModel(this PatientDiagnosisDTO d)
+        public static PatientDiagnose ConvertToModel(this PatientDiagnoseDTO d)
         {
-            return d != null ? new PatientDiagnosis
+            return d != null ? new PatientDiagnose
             {
                 Id = d.Id,
                 PatientId = d.PatientId,

@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="PatientsFormSchemaManager.cs" />
     <Compile Include="PatientsManager.cs" />
+    <Compile Include="Services\ExportService.cs" />
     <Compile Include="UserAccountsManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
