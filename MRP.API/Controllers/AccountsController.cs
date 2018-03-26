@@ -74,7 +74,7 @@ namespace MRP.API.Controllers
             catch (Exception ex) { return InternalServerError(ex); }
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [Route("UpdateUser"),HttpPut]
         public async Task<IHttpActionResult> UpdateUser([FromBody]UserDTO user)
         {

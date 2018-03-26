@@ -89,8 +89,7 @@ namespace MRP.API.Controllers
             }
             catch (Exception ex) { return InternalServerError(ex); }
         }
-
-        [AllowAnonymous]
+        
         [Route("ExportPatients"), HttpPost]
         public async Task<IHttpActionResult> ExportPatients([FromBody]string query)
         {
