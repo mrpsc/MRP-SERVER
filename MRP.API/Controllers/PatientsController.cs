@@ -95,6 +95,7 @@ namespace MRP.API.Controllers
         {
             try
             {
+                string query2 = await Request.Content.ReadAsStringAsync(); 
                 // IEnumerable<PatientDTO> patients = await _manager.GetPatients(query);
                 byte[] file = await _manager.ExportPatients(query);
                 var result = new HttpResponseMessage(HttpStatusCode.OK)
@@ -103,9 +104,9 @@ namespace MRP.API.Controllers
                 };
                 result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
                 {
-                    FileName = "Information" + DateTime.Now.Year.ToString() + ".xlsx"
+                    FileName = "Export" + DateTime.Now.Year.ToString() + ".csv"
                 };
-                result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.ms-excel");
+                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
                 var response = ResponseMessage(result);
                 return response;
             }
