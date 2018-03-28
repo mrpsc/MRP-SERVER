@@ -19,7 +19,7 @@ namespace MRP.DAL.Models
         public DateTime DischargeDate { get; set; }
         public DateTime InclusionDate { get; set; }
         public string General { get; set; }
-        [BsonDictionaryOptions(DictionaryRepresentation.ArrayOfDocuments)]
+        [BsonDictionaryOptions(DictionaryRepresentation.Document)]
         public Dictionary<string,dynamic> Symptoms { get; set; } = new Dictionary<string, dynamic>();
     }
 }

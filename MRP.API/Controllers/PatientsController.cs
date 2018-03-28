@@ -1,5 +1,6 @@
 ﻿using MRP.BL;
 using MRP.Common.DTO;
+using MRP.Common.DTO.Pages;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +14,7 @@ using System.Web.Http;
 
 namespace MRP.API.Controllers
 {
-    [RoutePrefix("api/Patients"),Authorize]
+    [RoutePrefix("api/Patients"), Authorize]
     public class PatientsController : ApiController
     {
         private PatientsManager _manager;
@@ -23,29 +24,44 @@ namespace MRP.API.Controllers
             _manager = new PatientsManager();
         }
 
-        [Route("GetPatients"),HttpPost]
-        public async Task<IHttpActionResult> GetPatients([FromBody]FindPatientModel model)
+        [Route("GetPatients"), HttpGet]
+        public async Task<IHttpActionResult> GetPatients([FromUri]string patientId)
         {
             try
             {
-                IEnumerable<PatientDTO> patients = await _manager.GetPatients(model);
-                return patients.Count() > 0 ? Json(patients) : (IHttpActionResult)BadRequest("no patients found!");
+                if(patientId != null)
+                {
+                    return Json(await _manager.GetPatient(patientId));
+                }
+                PatientPage patientPage = await _manager.GetPatients(new FindPatientModel { PatientId = patientId });
+                return patientPage.Patients.Count() > 0 ? Json(patientPage) : (IHttpActionResult)BadRequest("no patients found!");
             }
             catch (Exception ex) { return InternalServerError(ex); }
         }
 
         [Route("GetPatients"), HttpPost]
-        public async Task<IHttpActionResult> GetPatients([FromBody]string query, [FromUri]int limit, [FromUri]int skip)
+        public async Task<IHttpActionResult> GetPatients([FromBody]object body, [FromUri]int limit, [FromUri]int skip)
         {
             try
             {
-                IEnumerable<PatientDTO> patients = await _manager.GetPatients(query, limit, skip);
-                return patients.Count() > 0 ? Json(patients) : (IHttpActionResult)BadRequest("no patients found!");
+                string query = body.ToString();
+                PatientPage patientPage;
+                if (body == null || string.IsNullOrWhiteSpace(query))
+                {
+                    patientPage = new PatientPage
+                    {
+                        Patients = await _manager.GetPatients()
+                    };
+                    patientPage.Count = patientPage.Patients.Count();
+                }
+                else { patientPage = await _manager.GetPatients(query, limit, skip); }
+
+                return patientPage.Patients.Count() > 0 ? Json(patientPage) : (IHttpActionResult)BadRequest("no patients found!");
             }
             catch (Exception ex) { return InternalServerError(ex); }
         }
 
-        [Route("AddPatient"),HttpPost]
+        [Route("AddPatient"), HttpPost]
         public async Task<IHttpActionResult> AddPatient([FromBody]PatientDTO patient)
         {
             try
@@ -64,10 +80,10 @@ namespace MRP.API.Controllers
         //        return Ok();
         //    }
         //    catch (Exception ex) { return InternalServerError(ex); }
-            
+
         //}
 
-        [Route("EditPatient"),HttpPut]
+        [Route("EditPatient"), HttpPut]
         public async Task<IHttpActionResult> EditPatient([FromBody]PatientDTO patient)
         {
             try
@@ -79,7 +95,7 @@ namespace MRP.API.Controllers
             catch (Exception ex) { return InternalServerError(ex); }
         }
 
-        [Route("EditDiagnosis"),HttpPut]
+        [Route("EditDiagnosis"), HttpPut]
         public async Task<IHttpActionResult> EditDiagnose([FromBody]PatientDiagnoseDTO diagnosis)
         {
             try
@@ -89,13 +105,13 @@ namespace MRP.API.Controllers
             }
             catch (Exception ex) { return InternalServerError(ex); }
         }
-        
+
         [Route("ExportPatients"), HttpPost]
-        public async Task<IHttpActionResult> ExportPatients([FromBody]string query)
+        public async Task<IHttpActionResult> ExportPatients([FromBody]object body)
         {
             try
             {
-                string query2 = await Request.Content.ReadAsStringAsync(); 
+                string query = body.ToString();
                 // IEnumerable<PatientDTO> patients = await _manager.GetPatients(query);
                 byte[] file = await _manager.ExportPatients(query);
                 var result = new HttpResponseMessage(HttpStatusCode.OK)

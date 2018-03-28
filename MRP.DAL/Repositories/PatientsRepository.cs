@@ -14,6 +14,7 @@ using MRP.DAL.Services;
 using System.Reflection;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson;
+using MRP.Common.DTO.Pages;
 
 namespace MRP.DAL.Repositories
 {
@@ -37,7 +38,27 @@ namespace MRP.DAL.Repositories
             _patients = _database.GetCollection<Patient>("Patients");
         }
 
-        public async Task<IEnumerable<PatientDTO>> GetPatients(FindPatientModel model, int limit, int skip)
+        public async Task<PatientPage> GetPatient(string patientId)
+        {
+            try
+            {
+                var patients = await _patients.Find(p => p.PatientId == patientId).Limit(1).ToListAsync();
+                return new PatientPage { Patients = patients.ConvertToDTOExtension() };
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
+        }
+
+        public async Task<IEnumerable<PatientDTO>> GetPatients()
+        {
+            List<Patient> collection = await _patients.Find(p => true).ToListAsync();
+            return collection.ConvertToDTOExtension().ToList();
+        }
+
+        public async Task<PatientPage> GetPatients(FindPatientModel model, int limit, int skip)
         {
             try
             {
@@ -49,7 +70,12 @@ namespace MRP.DAL.Repositories
                                                 .ToListAsync();
                 else
                     collection = await _patients.Find(p => p.Name == model.Name).ToListAsync();
-                return collection.ConvertToDTOExtension().ToList();
+                var patientPage = new PatientPage
+                {
+                    Patients = collection.ConvertToDTOExtension().ToList(),
+                    Count = Convert.ToInt32(await _patients.CountAsync(new BsonDocument()))
+                };
+                return patientPage;
             }
             catch (Exception e)
             {
@@ -58,10 +84,12 @@ namespace MRP.DAL.Repositories
             }
         }
 
-        public async Task<IEnumerable<PatientDTO>> GetPatients(string query, int limit, int skip)
+        public async Task<PatientPage> GetPatients(string query, int limit, int skip)
         {
             try
             {
+                query = "{'Diagnose':{'Symptoms':" + query + "}}";
+                // db.patients.find({"diagnose.symptoms": JSON.Parse(query));
                 List<Patient> collection;
                 if (!String.IsNullOrWhiteSpace(query))
                     collection = await _patients.Find(query)
@@ -69,7 +97,12 @@ namespace MRP.DAL.Repositories
                                                 .Limit(limit)
                                                 .ToListAsync();
                 else return null;
-                return collection.ConvertToDTOExtension().ToList();
+                var patientPage = new PatientPage
+                {
+                    Patients = collection.ConvertToDTOExtension().ToList(),
+                    Count = Convert.ToInt32(await _patients.CountAsync(new BsonDocument()))
+                };
+                return patientPage;
             }
             catch (Exception e)
             {
@@ -142,6 +175,7 @@ namespace MRP.DAL.Repositories
                 return false;
             }
         }
+
 
         //public async Task<bool> AddDiagnosis(PatientDiagnosisDTO diagnosis)
         //{

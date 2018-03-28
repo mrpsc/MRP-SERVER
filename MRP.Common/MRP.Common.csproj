@@ -48,6 +48,7 @@
     <Compile Include="DTO\Gender.cs" />
     <Compile Include="DTO\LoginInfo.cs" />
     <Compile Include="DTO\MedicalInstitutionDTO.cs" />
+    <Compile Include="DTO\Pages\PatientPage.cs" />
     <Compile Include="DTO\Pages\UsersPage.cs" />
     <Compile Include="DTO\PatientDiagnosisDTO.cs" />
     <Compile Include="DTO\PatientDTO.cs" />
