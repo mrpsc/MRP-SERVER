@@ -52,5 +52,18 @@ namespace UnitTest
 
             Console.WriteLine(added.Result);
         }
+
+        [TestMethod]
+        public void TEST_IF_CAN_QUERY()
+        {
+            PatientsRepository repo = new PatientsRepository(CONNECTION_STRING, DB_NAME);
+            //string query = "{'Name':'g','Diagnose.Symptoms':{'DoseDay':'21'}}";
+            string query = "{'$and':[{'Diagnose':{$exists:true}},{'Diagnose.Symptoms':{$exists:true}},{'Diagnose.Symptoms.DoseDay':{'$eq':'21'}}]}";
+
+            var patientsTask = repo.GetPatients(query, 100, 0);
+
+
+            Console.WriteLine(patientsTask.Result);
+        }
     }
 }

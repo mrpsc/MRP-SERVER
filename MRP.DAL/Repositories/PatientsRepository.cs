@@ -88,14 +88,18 @@ namespace MRP.DAL.Repositories
         {
             try
             {
-                query = "{'Diagnose':{'Symptoms':" + query + "}}";
-                // db.patients.find({"diagnose.symptoms": JSON.Parse(query));
+                query = "{'$and':[{'Diagnose':{$exists:true}},{'Diagnose.Symptoms':{$exists:true}}," + query + "]}";
+                
+                var doc = BsonDocument.Parse(query);
                 List<Patient> collection;
                 if (!String.IsNullOrWhiteSpace(query))
-                    collection = await _patients.Find(query)
+                    collection = await _patients.Find(doc)
+                                                
                                                 .Skip(skip)
                                                 .Limit(limit)
                                                 .ToListAsync();
+
+
                 else return null;
                 var patientPage = new PatientPage
                 {
@@ -115,9 +119,12 @@ namespace MRP.DAL.Repositories
         {
             try
             {
+                query = "{'$and':[{'Diagnose':{$exists:true}},{'Diagnose.Symptoms':{$exists:true}}," + query + "]}";
+
+                var doc = BsonDocument.Parse(query);
                 List<Patient> collection;
                 if (!String.IsNullOrWhiteSpace(query))
-                    collection = await _patients.Find(query).ToListAsync();
+                    collection = await _patients.Find(doc).ToListAsync();
                 else return null;
                 return collection.ConvertToDTOExtension().ToList();
             }
