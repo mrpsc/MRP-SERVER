@@ -29,7 +29,7 @@ namespace MRP.API.Controllers
         {
             try
             {
-                if(patientId != null)
+                if (patientId != null)
                 {
                     return Json(await _manager.GetPatient(patientId));
                 }
@@ -45,16 +45,7 @@ namespace MRP.API.Controllers
             try
             {
                 string query = body.ToString();
-                PatientPage patientPage;
-                if (body == null || string.IsNullOrWhiteSpace(query))
-                {
-                    patientPage = new PatientPage
-                    {
-                        Patients = await _manager.GetPatients()
-                    };
-                    patientPage.Count = patientPage.Patients.Count();
-                }
-                else { patientPage = await _manager.GetPatients(query, limit, skip); }
+                PatientPage patientPage = await _manager.GetPatients(query, limit, skip);
 
                 return patientPage.Patients.Count() > 0 ? Json(patientPage) : (IHttpActionResult)BadRequest("no patients found!");
             }

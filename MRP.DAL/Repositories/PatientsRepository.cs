@@ -88,19 +88,23 @@ namespace MRP.DAL.Repositories
         {
             try
             {
-                query = "{'$and':[{'Diagnose':{$exists:true}},{'Diagnose.Symptoms':{$exists:true}}," + query + "]}";
-                
-                var doc = BsonDocument.Parse(query);
                 List<Patient> collection;
                 if (!String.IsNullOrWhiteSpace(query))
+                {
+                    query = "{'$and':[{'Diagnose':{$exists:true}},{'Diagnose.Symptoms':{$exists:true}}," + query + "]}";
+                    var doc = BsonDocument.Parse(query);
                     collection = await _patients.Find(doc)
-                                                
                                                 .Skip(skip)
                                                 .Limit(limit)
                                                 .ToListAsync();
-
-
-                else return null;
+                }
+                else
+                {
+                    collection = await _patients.Find(p => true)
+                                                .Skip(skip)
+                                                .Limit(limit)
+                                                .ToListAsync();
+                }
                 var patientPage = new PatientPage
                 {
                     Patients = collection.ConvertToDTOExtension().ToList(),
