@@ -23,7 +23,7 @@ namespace MRP.BL.Services
                     symptomNames.UnionWith(new HashSet<string>(patient.Diagnose.Symptoms.Keys));
                 }
             }
-            var myExport = new CsvExport(",",false);
+            var myExport = new CsvExport(",", false);
             foreach (var patient in patients)
             {
                 myExport.AddRow();
@@ -35,7 +35,8 @@ namespace MRP.BL.Services
                     {
                         if (patient.Diagnose.Symptoms.ContainsKey(symptom))
                         {
-                            myExport[symptom] = patient.Diagnose.Symptoms[symptom].ToString();
+                            if (patient.Diagnose.Symptoms[symptom] != null)
+                                myExport[symptom] = patient.Diagnose.Symptoms[symptom].ToString();
                         }
                     }
                 }
