@@ -12,8 +12,8 @@ namespace MRP.Common.DTO
         public string PatientId { get; set; }
         public string Name { get; set; }
         public DateTime DateOfBirth { get; set; }
-        public Gender Gender { get; set; }
-        public Race Race { get; set; }
+        //public Gender Gender { get; set; }
+        //public Race Race { get; set; }
         public DateTime InclusionDate { get; set; }
         public string General { get; set; }
         public DateTime LastModified { get; set; }

@@ -15,6 +15,7 @@ using System.Reflection;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson;
 using MRP.Common.DTO.Pages;
+using System.Diagnostics;
 
 namespace MRP.DAL.Repositories
 {
@@ -47,7 +48,7 @@ namespace MRP.DAL.Repositories
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Debug.WriteLine(e.Message);
                 return null;
             }
         }
@@ -79,7 +80,7 @@ namespace MRP.DAL.Repositories
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Debug.WriteLine(e.Message);
                 return null;
             }
         }
@@ -114,7 +115,7 @@ namespace MRP.DAL.Repositories
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Debug.WriteLine(e.Message);
                 return null;
             }
         }
@@ -134,22 +135,31 @@ namespace MRP.DAL.Repositories
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Debug.WriteLine(e.Message);
                 return null;
             }
         }
 
-        public async Task<bool> AddPatient(PatientDTO patient)
+        public async Task<PatientDTO> AddPatient(PatientDTO patient)
         {
             try
             {
-                await _patients.InsertOneAsync(patient.ConvertToModel());
-                return true;
+                var isExistingPatient = await _patients.Find(p => p.PatientId == patient.PatientId).FirstOrDefaultAsync();
+                if (isExistingPatient == null)
+                {
+                    await _patients.InsertOneAsync(patient.ConvertToModel());
+                    return (await _patients.Find(p => p.PatientId == patient.PatientId).FirstOrDefaultAsync()).ConvertToDTO();
+                }
+                else
+                {
+                    Debug.WriteLine("Patient already exists.");
+                    return patient;
+                }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
-                return false;
+                Debug.WriteLine(e.Message);
+                return null;
             }
         }
 
@@ -168,7 +178,7 @@ namespace MRP.DAL.Repositories
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Debug.WriteLine(e.Message);
                 return false;
             }
         }
@@ -182,7 +192,7 @@ namespace MRP.DAL.Repositories
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Debug.WriteLine(e.Message);
                 return false;
             }
         }

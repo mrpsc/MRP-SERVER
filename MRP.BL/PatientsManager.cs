@@ -35,7 +35,7 @@ namespace MRP.BL
             return _pRep.GetPatient(model);
         }
 
-        public Task<bool> AddPateint(PatientDTO patient)
+        public Task<PatientDTO> AddPateint(PatientDTO patient)
         {
             return _pRep.AddPatient(patient);
         }

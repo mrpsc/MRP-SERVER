@@ -12,7 +12,7 @@ namespace MRP.Common.IRepositories
     {
         Task<PatientPage> GetPatients(FindPatientModel model, int limit, int skip);
         Task<PatientPage> GetPatients(string query, int limit, int skip);
-        Task<bool> AddPatient(PatientDTO patient);
+        Task<PatientDTO> AddPatient(PatientDTO patient);
         Task<bool> UpdatePatient(PatientDTO patient);
         Task<bool> RemovePatient(string patientId);
         Task<bool> AddOrUpdateDiagnoseAsync(PatientDiagnoseDTO diagnose);

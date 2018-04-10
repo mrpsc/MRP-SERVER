@@ -57,7 +57,19 @@ namespace MRP.API.Controllers
         {
             try
             {
-                return await _manager.AddPateint(patient) ? Created<PatientDiagnoseDTO>("", null) : (IHttpActionResult)BadRequest("changes not excepted!");
+                PatientDTO patientDTO = await _manager.AddPateint(patient);
+                if (patientDTO == patient)
+                {
+                    return BadRequest("Patient already exists with the given ID.");
+                }
+                else if (patientDTO != null)
+                {
+                    return Created<PatientDTO>("Patient created successfuly", patientDTO);
+                }
+                else
+                {
+                    return (IHttpActionResult)BadRequest("changes not excepted!");
+                }
             }
             catch (Exception ex) { return InternalServerError(ex); }
         }
